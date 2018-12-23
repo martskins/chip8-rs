@@ -40,12 +40,6 @@ pub struct CPU {
 }
 
 impl CPU {
-    pub fn press_key(&mut self, key: usize) {
-        self.keypad[key] = true;
-    }
-}
-
-impl CPU {
     pub fn new() -> CPU {
         let mut mem = [0; RAM];
         for i in 0..FONT_SET.len() {
