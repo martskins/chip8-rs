@@ -1,10 +1,7 @@
 use crate::font::FONT_SET;
 use std::io::Read;
-use std::thread::sleep;
-use std::time::Duration;
 
 const OPCODE_SIZE: u16 = 2;
-// const HERTZ: u64 = 60;
 pub const SCREEN_WIDTH: usize = 64;
 pub const SCREEN_HEIGHT: usize = 32;
 const RAM: usize = 4096;
@@ -81,7 +78,6 @@ impl CPU {
     }
 
     pub fn tick(&mut self, keypad: [bool; 16]) {
-        // sleep(Duration::new(0, 10000));
         self.draw_screen = false;
         self.keypad = keypad;
         if self.keypad_waiting {
@@ -94,6 +90,7 @@ impl CPU {
                 }
             }
         } else {
+            self.fetch_and_process_opcode();
             if self.delay_timer > 0 {
                 self.delay_timer -= 1;
             }
@@ -101,8 +98,13 @@ impl CPU {
             if self.sound_timer > 0 {
                 self.sound_timer -= 1;
             }
-            self.fetch_and_process_opcode();
         }
+        for i in 0..self.keypad.len() {
+            if self.keypad[i] {
+                println!("{:?}", i);
+            }
+        }
+        // self.keypad = [false; 16];
     }
 
     fn process_opcode(&mut self) {

@@ -18,9 +18,9 @@ const SCALE: f64 = 10.0;
 impl App {
     fn render(&mut self, args: &RenderArgs) {
         use graphics::*;
-        if !self.cpu.draw_screen {
-            return;
-        }
+        // if !self.cpu.draw_screen {
+        //     return;
+        // }
         let display = self.cpu.display;
         self.gl.draw(args.viewport(), |c, gl| {
             for (y, &row) in display.iter().enumerate() {
@@ -62,45 +62,47 @@ pub fn start(path: &str) {
     app.cpu.load_rom(path);
 
     let mut events = Events::new(EventSettings::new());
-    events.ups(60);
+    events = events.ups(800);
     while let Some(e) = events.next(&mut window) {
-        if let Event::Input(input) = e {
-            if let Input::Button(button_args) = input {
-                if let Button::Keyboard(key) = button_args.button {
-                    if let Some(k) = map_key(key) {
-                        app.keypad[k] = true;
-                    }
-                }
+        if let Some(Button::Keyboard(key)) = e.press_args() {
+            if let Some(k) = map_key(key) {
+                app.keypad[k] = true;
             }
-        } else {
-            if let Some(r) = e.render_args() {
-                app.render(&r);
-            }
+        }
 
-            if let Some(u) = e.update_args() {
-                app.update(&u);
+        if let Some(Button::Keyboard(key)) = e.release_args() {
+            if let Some(k) = map_key(key) {
+                app.keypad[k] = false;
             }
+        }
+
+        if let Some(r) = e.render_args() {
+            app.render(&r);
+        }
+
+        if let Some(u) = e.update_args() {
+            app.update(&u);
         }
     }
 }
 
 fn map_key(key: Key) -> Option<usize> {
     match key {
-        Key::D7 => Some(0x00),
-        Key::D8 => Some(0x01),
-        Key::D9 => Some(0x02),
-        Key::D0 => Some(0x03),
+        Key::D7 => Some(0x01),
+        Key::D8 => Some(0x02),
+        Key::D9 => Some(0x03),
+        Key::D0 => Some(0x0C),
         Key::U => Some(0x04),
         Key::I => Some(0x05),
         Key::O => Some(0x06),
-        Key::P => Some(0x07),
-        Key::J => Some(0x08),
-        Key::K => Some(0x09),
-        Key::L => Some(0x0A),
-        Key::Semicolon => Some(0x0B),
-        Key::M => Some(0x0C),
-        Key::Comma => Some(0x0D),
-        Key::Period => Some(0x0E),
+        Key::P => Some(0x0D),
+        Key::J => Some(0x07),
+        Key::K => Some(0x08),
+        Key::L => Some(0x09),
+        Key::Semicolon => Some(0x0E),
+        Key::M => Some(0x0A),
+        Key::Comma => Some(0x00),
+        Key::Period => Some(0x0B),
         Key::Slash => Some(0x0F),
         _ => None,
     }
